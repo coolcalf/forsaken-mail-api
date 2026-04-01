@@ -1,0 +1,65 @@
+### Health check
+GET http://127.0.0.1:3000/api/health
+
+### Create inbox with explicit name
+POST http://127.0.0.1:3000/api/emails/generate
+Content-Type: application/json
+
+{
+  "name": "demo123",
+  "domain": "temp.example.com",
+  "expiryTime": 86400000
+}
+
+### Create inbox without name
+POST http://127.0.0.1:3000/api/emails/generate
+Content-Type: application/json
+
+{
+  "domain": "temp.example.com",
+  "expiryTime": 86400000
+}
+
+### Create inbox with blank name
+POST http://127.0.0.1:3000/api/emails/generate
+Content-Type: application/json
+
+{
+  "name": "   ",
+  "domain": "temp.example.com",
+  "expiryTime": 86400000
+}
+
+### List inboxes
+GET http://127.0.0.1:3000/api/emails
+
+### temp_mail admin create address
+POST http://127.0.0.1:3000/admin/new_address
+Content-Type: application/json
+Accept: application/json
+x-admin-auth: YOUR_ADMIN_PASSWORD
+
+{
+  "enablePrefix": true,
+  "name": "demo1",
+  "domain": "temp.example.com"
+}
+
+### temp_mail list mails via admin endpoint
+GET http://127.0.0.1:3000/admin/mails?limit=1&offset=0
+x-admin-auth: YOUR_ADMIN_PASSWORD
+
+### temp_mail list mails for one address via admin endpoint
+GET http://127.0.0.1:3000/admin/mails?limit=20&offset=0&address=test@example.com
+x-admin-auth: YOUR_ADMIN_PASSWORD
+
+### temp_mail list mails via bearer token
+GET http://127.0.0.1:3000/api/mails
+Authorization: Bearer SOME_USER_TOKEN
+
+### temp_mail read one mail via bearer token
+GET http://127.0.0.1:3000/api/mails/msg_1
+Authorization: Bearer SOME_USER_TOKEN
+
+### temp_mail list mails by address without bearer token
+GET http://127.0.0.1:3000/api/mails?address=test@example.com

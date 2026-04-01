@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="keywords" content="临时邮箱,forsaken mail api,disposable mail">
+  <title>Forsaken Mail API</title>
+  <link href="https://lib.baomitu.com/semantic-ui/2.1.7/semantic.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/app.css">
+  <link rel="stylesheet" href="/css/prism.css">
+</head>
+<body>
+<div class="appShell">
+  <div class="ui fixed borderless menu topbar">
+    <div class="ui text container topbarInner" style="max-width: 100% !important;">
+      <div class="brandBlock">
+        <div href="#" class="header item brandTitle">
+          <img class="logo" src="//semantic-ui.com/examples/assets/images/logo.png" alt="logo">
+          Forsaken Mail API
+        </div>
+        <div class="brandMeta" data-i18n="brandMeta">Self-hosted disposable inbox with MoeMail-compatible API</div>
+      </div>
+      <div class="mailToolbar">
+        <button id="languageToggle" class="ui button languageToggle" type="button" title="Switch language / 切换语言">
+          <i class="world icon"></i>
+          <span class="languageLabel">EN</span>
+        </button>
+        <select id="domainSelect" class="ui dropdown"></select>
+        <div class="ui icon input addressInputWrap">
+          <input id="shortid" type="text" placeholder="请等待分配临时邮箱" data-placeholder-key="placeholder.waiting" disabled>
+          <button id="refreshShortid" class="refreshButton" type="button" title="刷新邮箱地址" data-i18n-title="button.refresh">
+            <i class="refresh icon"></i>
+          </button>
+        </div>
+        <button id="copyAddress" class="ui icon button" type="button" title="复制邮箱地址" data-i18n-title="button.copy">
+          <i class="copy icon"></i>
+        </button>
+        <button id="customShortid" class="ui icon button" type="button" title="自定义邮箱前缀" data-i18n-title="button.customPrefix">
+          <i class="edit icon"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <div class="ui main container mainWorkspace">
+    <div class="workspaceGrid">
+      <div class="workspaceColumn inboxColumn">
+        <div class="panelCard inboxPanel">
+          <div class="panelHeader">
+            <div>
+              <div class="panelEyebrow" data-i18n="panel.inboxEyebrow">Inbox</div>
+              <h2 data-i18n="panel.inboxTitle">邮件列表</h2>
+            </div>
+            <div class="panelHint" data-i18n="panel.inboxHint">点击一封邮件查看详情</div>
+          </div>
+          <div id="emptyInbox" class="emptyState">
+            <div class="emptyStateIcon"><i class="inbox icon"></i></div>
+            <h3 data-i18n="empty.readyTitle">收件箱已就绪</h3>
+            <p data-i18n="empty.readyDesc">新邮件到达后会出现在这里。你可以切换域名、复制地址，或等待外部邮件投递。</p>
+          </div>
+          <table class="ui very basic selectable table inboxTable">
+            <thead>
+            <tr>
+              <th data-i18n="table.from">发信人</th>
+              <th data-i18n="table.subject">主题</th>
+              <th data-i18n="table.time">时间</th>
+            </tr>
+            </thead>
+            <tbody id="maillist">
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="workspaceColumn viewerColumn">
+        <div class="panelCard viewerPanel" id="mailcard">
+          <div class="content viewerHeader">
+            <div>
+              <div class="panelEyebrow" data-i18n="panel.previewEyebrow">Preview</div>
+              <div class="header" data-i18n="preview.emptyTitle">我的邮件在哪里？</div>
+              <div id="mailMeta" class="viewerMeta" data-i18n="preview.waitingMeta">等待新邮件到达</div>
+            </div>
+            <i class="code icon right floated"></i>
+          </div>
+          <div class="content viewerBody">
+            <div id="mailPlaceholder" class="viewerPlaceholder">
+              <p data-i18n="preview.emptyLead">等等就来( ͡° ͜ʖ ͡°)</p>
+              <span data-i18n="preview.emptyDesc">当你点击左侧邮件列表中的一封邮件时，这里会展示 HTML 预览和原始内容入口。</span>
+            </div>
+            <div id="mailContent"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="ui modal" id="raw">
+  <div class="header">
+  </div>
+  <div class="content">
+  </div>
+</div>
+<div id="copyToast" class="ui tiny green message" style="display:none; position:fixed; top:70px; right:20px; z-index:1000; margin:0;">
+  Address copied
+</div>
+</body>
+<script src="https://lib.baomitu.com/jquery/2.1.4/jquery.min.js"></script>
+<script src="https://lib.baomitu.com/semantic-ui/2.1.7/semantic.min.js"></script>
+<script src="https://lib.baomitu.com/socket.io/1.3.7/socket.io.min.js"></script>
+<script>window.__FORSAKEN_MAIL_CONFIG__ = { primaryDomain: "__PRIMARY_DOMAIN__", domains: __DOMAINS__ };</script>
+<script src="/js/app.js"></script>
+<script src="/js/prism.js"></script>
+</html>

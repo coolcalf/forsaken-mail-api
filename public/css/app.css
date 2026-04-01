@@ -1,0 +1,635 @@
+:root {
+    --bg: #f5f1e8;
+    --surface: rgba(255, 251, 245, 0.92);
+    --surface-strong: #fffdf9;
+    --line: rgba(71, 49, 31, 0.14);
+    --line-strong: rgba(71, 49, 31, 0.24);
+    --text: #2f241b;
+    --muted: #7a6655;
+    --accent: #a44d2e;
+    --accent-soft: rgba(164, 77, 46, 0.12);
+    --shadow: 0 24px 60px rgba(74, 50, 33, 0.12);
+}
+
+body {
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: var(--text);
+    background:
+        radial-gradient(circle at top left, rgba(164, 77, 46, 0.12), transparent 30%),
+        radial-gradient(circle at top right, rgba(214, 170, 108, 0.18), transparent 28%),
+        linear-gradient(180deg, #f8f4ec 0%, #f1ebdf 100%);
+}
+
+.appShell {
+    min-height: 100vh;
+}
+
+.menu.topbar {
+    border-radius: 0;
+    border: none;
+    box-shadow: 0 18px 44px rgba(74, 50, 33, 0.1);
+    background: rgba(255, 250, 244, 0.88);
+    backdrop-filter: blur(14px);
+    padding: 1rem 0;
+}
+
+.topbarInner {
+    display: flex !important;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 0 1.5rem;
+}
+
+.brandBlock {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    padding-bottom: 0.15rem;
+}
+
+.brandTitle {
+    padding: 0 !important;
+    margin: 0 !important;
+    color: var(--text) !important;
+    font-size: 1.45rem !important;
+    letter-spacing: 0.04em;
+}
+
+.menu .item img.logo {
+    margin-right: 0.9rem !important;
+    width: 2rem !important;
+    height: 2rem !important;
+    border-radius: 0.65rem;
+    box-shadow: 0 10px 22px rgba(74, 50, 33, 0.18);
+    position: relative;
+    top: 0.32rem;
+}
+
+.brandMeta {
+    margin-top: 0.25rem;
+    padding-left: 2.95rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+.mailToolbar {
+    display: flex;
+    position: relative;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    padding: 0;
+    width: min(100%, 42rem);
+    overflow: visible;
+}
+
+#copyAddress,
+#customShortid,
+#languageToggle,
+#domainSelect,
+.addressInputWrap,
+.addressInputWrap input {
+    height: 3rem !important;
+    border-radius: 0.95rem !important;
+    border: 1px solid var(--line) !important;
+    background: var(--surface-strong) !important;
+    color: var(--text) !important;
+    font-size: 0.95rem !important;
+    box-shadow: none !important;
+}
+
+#copyAddress,
+#customShortid,
+#languageToggle {
+    flex: 0 0 auto;
+    width: 3rem;
+    min-width: 3rem;
+    padding: 0 !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 253, 249, 0.72) !important;
+}
+
+#languageToggle {
+    width: auto;
+    min-width: 3.6rem;
+    padding: 0 0.9rem !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.08em;
+    gap: 0.4rem;
+}
+
+#languageToggle i {
+    margin: 0 !important;
+    opacity: 0.8;
+}
+
+#languageToggle.is-english {
+    background: rgba(164, 77, 46, 0.14) !important;
+    border-color: rgba(164, 77, 46, 0.28) !important;
+}
+
+#copyAddress:hover,
+#customShortid:hover,
+#languageToggle:hover {
+    background: var(--accent-soft) !important;
+    border-color: var(--line-strong) !important;
+}
+
+#customShortid.active {
+    background: rgba(164, 77, 46, 0.16) !important;
+    border-color: rgba(164, 77, 46, 0.32) !important;
+}
+
+#domainSelect {
+    display: none;
+    flex: 0 1 11rem;
+    min-width: 9rem;
+    max-width: 13rem;
+    margin: 0 !important;
+    padding: 0 2.4rem 0 0.95rem;
+    line-height: 3rem;
+    appearance: none;
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 1px solid rgba(71, 49, 31, 0.14) !important;
+    background-image:
+        linear-gradient(45deg, transparent 50%, var(--muted) 50%),
+        linear-gradient(135deg, var(--muted) 50%, transparent 50%);
+    background-position:
+        calc(100% - 1rem) calc(1.2rem),
+        calc(100% - 0.7rem) calc(1.2rem);
+    background-size: 0.35rem 0.35rem, 0.35rem 0.35rem;
+    background-repeat: no-repeat;
+}
+
+.addressInputWrap {
+    flex: 1 1 20rem;
+    min-width: 16rem;
+    width: auto !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    overflow: hidden;
+    padding: 0 !important;
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
+}
+
+.addressInputWrap::before {
+    content: "";
+    width: 1px;
+    align-self: stretch;
+    background: rgba(71, 49, 31, 0.14);
+    margin-left: -1px;
+}
+
+.addressInputWrap.invalid {
+    border-color: rgba(196, 62, 62, 0.42) !important;
+    box-shadow: 0 0 0 3px rgba(196, 62, 62, 0.12) !important;
+}
+
+.addressInputWrap.invalid::before {
+    background: rgba(196, 62, 62, 0.3);
+}
+
+.addressInputWrap.success {
+    border-color: rgba(47, 131, 88, 0.38) !important;
+    box-shadow: 0 0 0 3px rgba(47, 131, 88, 0.12) !important;
+}
+
+.addressInputWrap.success::before {
+    background: rgba(47, 131, 88, 0.28);
+}
+
+.addressInputWrap input {
+    flex: 1 1 auto;
+    min-width: 0;
+    width: auto;
+    height: 100% !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    line-height: 3rem !important;
+    padding-left: 0.95rem !important;
+    padding-right: 0.75rem !important;
+}
+
+.refreshButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.5rem;
+    height: 2.5rem;
+    margin-right: 0.2rem;
+    border: none;
+    border-radius: 0.75rem;
+    background: rgba(164, 77, 46, 0.08);
+    color: var(--accent);
+    cursor: pointer;
+}
+
+.refreshButton:hover {
+    background: rgba(164, 77, 46, 0.14);
+}
+
+.refreshButton i {
+    margin: 0 !important;
+    line-height: 1 !important;
+}
+
+#shortid {
+    -webkit-user-select: initial;
+    -moz-user-select: initial;
+    -ms-user-select: initial;
+    user-select: initial;
+}
+
+.mainWorkspace {
+    padding-top: 8.6rem;
+    padding-bottom: 2.2rem;
+}
+
+.workspaceGrid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.18fr) minmax(0, 0.82fr);
+    gap: 1rem;
+    align-items: stretch;
+}
+
+.workspaceColumn {
+    display: flex;
+    min-width: 0;
+}
+
+.panelCard {
+    border: 1px solid rgba(71, 49, 31, 0.12);
+    border-radius: 1.4rem;
+    background: var(--surface);
+    box-shadow:
+        0 14px 32px rgba(74, 50, 33, 0.08),
+        0 2px 0 rgba(255, 255, 255, 0.6) inset;
+    overflow: hidden;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.panelHeader,
+.viewerHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.4rem 1rem !important;
+    border-bottom: 1px solid rgba(71, 49, 31, 0.08);
+    background: linear-gradient(180deg, rgba(255,255,255,0.62), rgba(255,255,255,0.12));
+    min-height: 5.6rem;
+}
+
+.panelEyebrow {
+    color: var(--accent);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.85;
+}
+
+.panelHeader h2,
+.viewerHeader .header {
+    margin: 0.2rem 0 0;
+    color: var(--text) !important;
+    font-size: 1.35rem;
+    font-weight: 700;
+}
+
+.panelHeader > div:first-child,
+.viewerHeader > div:first-child {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100%;
+}
+
+.panelHint {
+    color: var(--muted);
+    font-size: 0.84rem;
+}
+
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.7rem;
+    padding: 2rem 1.4rem 1.4rem;
+    text-align: center;
+    color: var(--muted);
+}
+
+.emptyStateIcon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    border-radius: 1rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+    font-size: 1.3rem;
+}
+
+.emptyState h3 {
+    margin: 0;
+    color: var(--text);
+}
+
+.emptyState p {
+    max-width: 30rem;
+    margin: 0;
+}
+
+.inboxTable {
+    margin: 0 !important;
+}
+
+.inboxTable thead th {
+    color: var(--muted) !important;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--line) !important;
+    padding-left: 1.4rem !important;
+    padding-right: 1.4rem !important;
+}
+
+.inboxTable tbody td {
+    padding-left: 1.4rem !important;
+    padding-right: 1.4rem !important;
+}
+
+.inboxTable tbody tr {
+    transition: background-color 0.18s ease, transform 0.18s ease;
+}
+
+.inboxTable tbody tr:hover {
+    background: rgba(164, 77, 46, 0.06) !important;
+}
+
+#maillist.loading {
+    opacity: 0.45;
+    pointer-events: none;
+}
+
+#mailcard.loading {
+    opacity: 0.78;
+}
+
+.inboxTable tbody tr.active {
+    background: rgba(164, 77, 46, 0.12) !important;
+    box-shadow: inset 3px 0 0 var(--accent);
+}
+
+.inboxTable td,
+.inboxTable th {
+    vertical-align: middle !important;
+}
+
+.senderCell {
+    width: 34%;
+    max-width: 18rem;
+}
+
+.subjectCell {
+    width: 46%;
+}
+
+.timeCell {
+    width: 20%;
+    min-width: 6.5rem;
+    text-align: right;
+    white-space: nowrap;
+    color: var(--muted);
+}
+
+.cellText {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.senderCell .cellText {
+    font-weight: 600;
+    color: var(--text);
+}
+
+.subjectCell .cellText {
+    color: var(--muted);
+}
+
+@media (max-width: 720px) {
+    .senderCell,
+    .subjectCell,
+    .timeCell {
+        width: auto;
+        max-width: none;
+    }
+
+    .inboxTable {
+        table-layout: fixed;
+    }
+}
+
+#mailcard {
+    width: 100% !important;
+}
+
+.viewerBody {
+    min-height: 18rem;
+    color: var(--text);
+    padding: 1.35rem 1.45rem 1.55rem !important;
+    flex: 1 1 auto;
+}
+
+.viewerMeta {
+    margin-top: 0.35rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.viewerPlaceholder {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 16rem;
+    color: var(--muted);
+    padding-left: 0.1rem;
+}
+
+.viewerPlaceholder p {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text);
+}
+
+.viewerPlaceholder span {
+    max-width: 28rem;
+}
+
+#mailContent {
+    color: var(--text);
+    padding-top: 0.25rem;
+}
+
+#mailContent > :first-child {
+    margin-top: 0 !important;
+}
+
+#mailContent p,
+#mailContent ul,
+#mailContent ol,
+#mailContent blockquote,
+#mailContent table,
+#mailContent pre {
+    margin: 0 0 1rem;
+}
+
+#mailContent p,
+#mailContent li {
+    line-height: 1.72;
+}
+
+#mailContent h1,
+#mailContent h2,
+#mailContent h3,
+#mailContent h4,
+#mailContent h5,
+#mailContent h6 {
+    color: var(--text);
+    margin: 1.1rem 0 0.65rem;
+    line-height: 1.25;
+}
+
+#mailContent a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+}
+
+#mailContent img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 0.9rem;
+    box-shadow: 0 12px 30px rgba(74, 50, 33, 0.12);
+}
+
+#mailContent blockquote {
+    padding: 0.9rem 1rem;
+    border-left: 3px solid var(--accent);
+    background: rgba(164, 77, 46, 0.07);
+    color: var(--muted);
+    border-radius: 0 0.85rem 0.85rem 0;
+}
+
+#mailContent table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 0.9rem;
+    background: rgba(255, 255, 255, 0.5);
+}
+
+#mailContent th,
+#mailContent td {
+    padding: 0.7rem 0.85rem;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+}
+
+#mailContent pre,
+#mailContent code {
+    font-family: Consolas, Monaco, monospace;
+}
+
+#mailContent pre {
+    padding: 1rem;
+    border-radius: 0.9rem;
+    background: #2f241b;
+    color: #f8f4ec;
+    overflow-x: auto;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+#mailContent code {
+    padding: 0.15rem 0.38rem;
+    border-radius: 0.4rem;
+    background: rgba(47, 36, 27, 0.08);
+}
+
+#mailContent pre code {
+    padding: 0;
+    background: transparent;
+}
+
+#raw .content {
+    max-height: 70vh;
+    overflow: auto;
+}
+
+#copyToast {
+    border-radius: 0.9rem;
+    box-shadow: 0 16px 36px rgba(74, 50, 33, 0.16);
+}
+
+@media (max-width: 1100px) {
+    .topbarInner {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .mailToolbar {
+        max-width: 100%;
+        justify-content: stretch;
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 720px) {
+    .mainWorkspace {
+        padding-top: 11.5rem;
+    }
+
+    .brandMeta {
+        padding-left: 0;
+    }
+
+    .mailToolbar {
+        padding: 0.75rem;
+    }
+
+    #domainSelect,
+    .addressInputWrap {
+        flex-basis: 100%;
+        max-width: 100%;
+    }
+
+    .workspaceGrid {
+        grid-template-columns: 1fr;
+    }
+}

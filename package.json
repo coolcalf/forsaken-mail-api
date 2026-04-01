@@ -1,0 +1,32 @@
+{
+  "name": "forsaken-mail-api",
+  "version": "1.0.0",
+  "description": "Forsaken Mail API - self-hosted disposable mail service with MoeMail-compatible inbox API",
+  "main": "app.js",
+  "scripts": {
+    "start": "node ./bin/www",
+    "test": "node --test",
+    "postinstall": "node ./scripts/patch-smtp-server.js"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/denghongcai/forrsaken-mail.git"
+  },
+  "author": "Hongcai Deng",
+  "license": "GPL-2.0",
+  "bugs": {
+    "url": "https://github.com/denghongcai/forrsaken-mail/issues"
+  },
+  "homepage": "https://github.com/denghongcai/forrsaken-mail#readme",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "debug": "^2.2.0",
+    "express": "^4.13.3",
+    "mailin": "^3.0.2",
+    "shortid": "^2.2.4",
+    "socket.io": "^1.3.7"
+  }
+}
