@@ -14,6 +14,8 @@ let debug = require('debug')('server');
 let io = require('socket.io');
 let http = require('http');
 
+installProcessErrorHandlers();
+
 /**
  * Get port from environment and store in Express.
  */
@@ -28,6 +30,8 @@ app.set('port', port);
 let server = http.createServer(app);
 ioApp(io(server));
 app.locals.startBackgroundJobs();
+
+server.on('clientError', onClientError);
 
 
 /**
@@ -96,4 +100,79 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+}
+
+function onClientError(error, socket) {
+  console.error(formatRuntimeError('HTTP client error', error));
+
+  if (!socket || socket.destroyed) {
+    return;
+  }
+
+  socket.end('HTTP/1.1 400 Bad Request\r\nConnection: close\r\nContent-Type: application/json\r\n\r\n{"error":"Bad Request"}');
+}
+
+function installProcessErrorHandlers() {
+  process.on('uncaughtException', function(error) {
+    if (isIgnorableSmtpSocketError(error)) {
+      console.error(formatRuntimeError('Ignoring SMTP socket error', error));
+      return;
+    }
+
+    console.error(formatRuntimeError('Unhandled exception', error));
+    process.exit(1);
+  });
+
+  process.on('unhandledRejection', function(reason) {
+    if (isIgnorableSmtpSocketError(reason)) {
+      console.error(formatRuntimeError('Ignoring SMTP socket rejection', reason));
+      return;
+    }
+
+    console.error(formatRuntimeError('Unhandled rejection', reason));
+    process.exit(1);
+  });
+}
+
+function isIgnorableSmtpSocketError(error) {
+  if (!error || typeof error !== 'object') {
+    return false;
+  }
+
+  const code = typeof error.code === 'string' ? error.code : '';
+  const syscall = typeof error.syscall === 'string' ? error.syscall : '';
+  const message = typeof error.message === 'string' ? error.message : '';
+  const stack = typeof error.stack === 'string' ? error.stack : '';
+  const combined = `${message}\n${stack}`;
+
+  if (code !== 'ECONNRESET') {
+    return false;
+  }
+
+  const looksLikeMailin = combined.includes('smtp-server')
+    || combined.includes('mailin')
+    || combined.includes('SMTPConnection')
+    || combined.includes('SMTPStream');
+
+  if (looksLikeMailin) {
+    return true;
+  }
+
+  return false;
+}
+
+function formatRuntimeError(prefix, error) {
+  if (!error) {
+    return `${prefix}: Unknown error`;
+  }
+
+  if (error.stack) {
+    return `${prefix}: ${error.stack}`;
+  }
+
+  if (error.message) {
+    return `${prefix}: ${error.message}`;
+  }
+
+  return `${prefix}: ${String(error)}`;
 }
