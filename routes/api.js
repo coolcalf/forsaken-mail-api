@@ -31,6 +31,27 @@ function getDomains() {
   return [];
 }
 
+function shouldAssignRandomDomainWhenEmpty() {
+  if (typeof config.randomDomainOnEmpty === 'boolean') {
+    return config.randomDomainOnEmpty;
+  }
+
+  return true;
+}
+
+function resolveRequestedDomain(payloadDomain, domains) {
+  const requestedDomain = String(payloadDomain || '').trim().toLowerCase();
+  if (requestedDomain) {
+    return requestedDomain;
+  }
+
+  if (!shouldAssignRandomDomainWhenEmpty() || domains.length === 0) {
+    return '';
+  }
+
+  return domains[crypto.randomInt(domains.length)];
+}
+
 function getApiKeyHeader() {
   return process.env.FORSAKEN_MAIL_API_KEY_HEADER || 'X-API-Key';
 }
@@ -214,6 +235,22 @@ function getInboxName(value) {
   return shortid.generate().toLowerCase();
 }
 
+function findInboxByName(store, name, domains) {
+  const normalizedName = String(name || '').trim().toLowerCase();
+  if (!normalizedName) {
+    return null;
+  }
+
+  for (const domain of domains) {
+    const inbox = store.getInboxByAddress(`${normalizedName}@${domain}`);
+    if (inbox) {
+      return inbox;
+    }
+  }
+
+  return null;
+}
+
 router.use(function(req, res, next) {
   const apiKey = getConfiguredApiKey();
   if (!apiKey) {
@@ -238,7 +275,7 @@ router.post('/emails/generate', function(req, res) {
   const domains = getDomains();
   const payload = req.body || {};
   const name = getInboxName(payload.name);
-  const domain = String(payload.domain || domains[0] || '').trim().toLowerCase();
+  const domain = resolveRequestedDomain(payload.domain, domains);
   const expiryTime = payload.expiryTime === undefined ? DEFAULT_EXPIRY_MS : Number(payload.expiryTime);
 
   if (!/^[a-z0-9._-]+$/.test(name)) {
@@ -277,7 +314,7 @@ router.post('/admin/new_address', function(req, res) {
   const domains = getDomains();
   const payload = req.body || {};
   const name = getInboxName(payload.name);
-  const domain = String(payload.domain || '').trim().toLowerCase();
+  const domain = resolveRequestedDomain(payload.domain, domains);
 
   if (!payload || typeof payload !== 'object') {
     return res.status(400).json(buildErrorPayload('invalid_payload', 'request body must be a json object'));
@@ -342,6 +379,26 @@ router.get('/emails', function(req, res) {
     emails: result.emails.map(mapEmail),
     nextCursor: result.nextCursor,
     total: result.total,
+  });
+});
+
+router.get('/emails/resolve', function(req, res) {
+  const store = createApiStore();
+  const domains = getDomains();
+  const name = String(req.query.name || '').trim().toLowerCase();
+
+  if (!name) {
+    return res.status(400).json(buildErrorPayload('invalid_name', 'invalid mailbox name'));
+  }
+
+  const inbox = findInboxByName(store, name, domains);
+  if (!inbox) {
+    return res.status(404).json(buildErrorPayload('inbox_not_found', 'mailbox not found'));
+  }
+
+  return res.json({
+    id: inbox.id,
+    address: inbox.address,
   });
 });
 

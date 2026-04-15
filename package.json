@@ -1,6 +1,6 @@
 {
   "name": "forsaken-mail-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Forsaken Mail API - self-hosted disposable mail service with MoeMail-compatible inbox API",
   "main": "app.js",
   "scripts": {

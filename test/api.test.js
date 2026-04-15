@@ -151,6 +151,87 @@ test('POST /api/emails/generate auto-generates a valid name when name is missing
   });
 });
 
+test('POST /api/emails/generate picks a configured domain when domain is missing', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'forsaken-mail-api-'));
+  process.env.FORSAKEN_MAIL_DB_PATH = path.join(dir, 'test.sqlite');
+  process.env.FORSAKEN_MAIL_DOMAINS = 'example.test,mail.example.test';
+
+  const dbModule = require(dbModulePath);
+  dbModule.resetStore();
+
+  const app = loadApp();
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/api/emails/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'auto-domain',
+        expiryTime: 24 * 60 * 60 * 1000
+      })
+    });
+
+    assert.equal(response.status, 200);
+
+    const body = await response.json();
+    assert.match(body.email, /^auto-domain@(example\.test|mail\.example\.test)$/);
+  } finally {
+    await new Promise((resolve, reject) => {
+      server.close((error) => error ? reject(error) : resolve());
+    });
+    delete process.env.FORSAKEN_MAIL_DB_PATH;
+    delete process.env.FORSAKEN_MAIL_DOMAINS;
+    dbModule.resetStore();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('POST /api/emails/generate picks a configured domain when domain is blank', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'forsaken-mail-api-'));
+  process.env.FORSAKEN_MAIL_DB_PATH = path.join(dir, 'test.sqlite');
+  process.env.FORSAKEN_MAIL_DOMAINS = 'example.test,mail.example.test';
+
+  const dbModule = require(dbModulePath);
+  dbModule.resetStore();
+
+  const app = loadApp();
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  try {
+    const response = await fetch(`http://127.0.0.1:${server.address().port}/api/emails/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        name: 'blank-domain',
+        domain: '   ',
+        expiryTime: 24 * 60 * 60 * 1000
+      })
+    });
+
+    assert.equal(response.status, 200);
+
+    const body = await response.json();
+    assert.match(body.email, /^blank-domain@(example\.test|mail\.example\.test)$/);
+  } finally {
+    await new Promise((resolve, reject) => {
+      server.close((error) => error ? reject(error) : resolve());
+    });
+    delete process.env.FORSAKEN_MAIL_DB_PATH;
+    delete process.env.FORSAKEN_MAIL_DOMAINS;
+    dbModule.resetStore();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
 test('POST /api/emails/generate rejects invalid expiry values', async () => {
   await withServer(async ({ request }) => {
     const response = await request('/api/emails/generate', {
@@ -358,6 +439,93 @@ test('POST /admin/new_address skips auth when admin password is unset', async ()
     assert.equal(body.address, 'openadmin@example.test');
     assert.equal(typeof body.jwt, 'string');
   });
+});
+
+test('GET /api/emails/resolve returns existing inbox by local part across configured domains', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'forsaken-mail-api-'));
+  process.env.FORSAKEN_MAIL_DB_PATH = path.join(dir, 'test.sqlite');
+  process.env.FORSAKEN_MAIL_DOMAINS = 'example.test,mail.example.test';
+
+  const dbModule = require(dbModulePath);
+  dbModule.resetStore();
+
+  const app = loadApp();
+  const server = http.createServer(app);
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const createResponse = await fetch(`${baseUrl}/api/emails/generate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: 'resolve-demo',
+        domain: 'mail.example.test',
+        expiryTime: 24 * 60 * 60 * 1000
+      })
+    });
+    assert.equal(createResponse.status, 200);
+
+    const response = await fetch(`${baseUrl}/api/emails/resolve?name=resolve-demo`);
+    assert.equal(response.status, 200);
+
+    const body = await response.json();
+    assert.equal(body.address, 'resolve-demo@mail.example.test');
+    assert.equal(typeof body.id, 'string');
+  } finally {
+    await new Promise((resolve, reject) => {
+      server.close((error) => error ? reject(error) : resolve());
+    });
+    delete process.env.FORSAKEN_MAIL_DB_PATH;
+    delete process.env.FORSAKEN_MAIL_DOMAINS;
+    dbModule.resetStore();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
+});
+
+test('POST /admin/new_address picks a configured domain when domain is missing', async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'forsaken-mail-api-'));
+  process.env.FORSAKEN_MAIL_DB_PATH = path.join(dir, 'test.sqlite');
+  process.env.FORSAKEN_MAIL_DOMAINS = 'example.test,mail.example.test';
+  process.env.FORSAKEN_MAIL_ADMIN_PASSWORD = 'admin-secret';
+
+  const dbModule = require(dbModulePath);
+  dbModule.resetStore();
+
+  const app = loadApp();
+  const server = http.createServer(app);
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+
+  try {
+    const baseUrl = `http://127.0.0.1:${server.address().port}`;
+    const response = await fetch(`${baseUrl}/admin/new_address`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'x-admin-auth': 'admin-secret'
+      },
+      body: JSON.stringify({
+        enablePrefix: true,
+        name: 'auto-admin'
+      })
+    });
+
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.match(body.address, /^auto-admin@(example\.test|mail\.example\.test)$/);
+    assert.equal(typeof body.jwt, 'string');
+  } finally {
+    await new Promise((resolve, reject) => {
+      server.close((error) => error ? reject(error) : resolve());
+    });
+    delete process.env.FORSAKEN_MAIL_DB_PATH;
+    delete process.env.FORSAKEN_MAIL_DOMAINS;
+    delete process.env.FORSAKEN_MAIL_ADMIN_PASSWORD;
+    dbModule.resetStore();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });
 
 test('GET /api/mails and /api/mails/:id return temp_mail-compatible message payloads', async () => {
@@ -675,6 +843,21 @@ test('frontend script loads inbox history after applying custom prefix', () => {
 test('frontend script exposes loading state for inbox history fetch', () => {
   const script = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'js', 'app.js'), 'utf8');
   assert.match(script, /setInboxLoading\(/);
+});
+
+test('frontend script loads inbox history by full address through temp_mail-compatible endpoint', () => {
+  const script = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'js', 'app.js'), 'utf8');
+  assert.match(script, /fetch\('\/api\/mails\?address=' \+ encodeURIComponent\(address\)\)/);
+});
+
+test('frontend script resolves existing inbox address before applying custom prefix', () => {
+  const script = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'js', 'app.js'), 'utf8');
+  assert.match(script, /fetch\('\/api\/emails\/resolve\?name=' \+ encodeURIComponent\(localPart\)\)/);
+});
+
+test('frontend script reloads inbox history after switching domain', () => {
+  const script = require('node:fs').readFileSync(require('node:path').join(__dirname, '..', 'public', 'js', 'app.js'), 'utf8');
+  assert.match(script, /socket\.emit\('set shortid', \{ id: localPart, domain: activeDomain \}\);\s+loadInboxHistory\(\);/);
 });
 
 test('frontend styles include invalid custom prefix input state', () => {

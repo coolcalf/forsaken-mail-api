@@ -148,10 +148,20 @@ docker run --name forsaken-mail-api -d \
 
 API 会校验请求中的邮箱域名。默认情况下，它使用 `config-default.json` 中的 `host` 值。
 
+默认情况下，`POST /api/emails/generate` 和 `POST /admin/new_address` 在 `domain` 不传或为空字符串时，会从当前已配置的可用域名里随机选择一个域名创建邮箱。如果你仍然需要旧的严格模式，可以在 `config-default.json` 中将 `randomDomainOnEmpty` 设为 `false`。
+
 你也可以通过下面的环境变量覆盖：
 
 ```bash
 FORSAKEN_MAIL_DOMAINS=mail.example.com,node.example.com
+```
+
+默认配置示例：
+
+```json
+{
+  "randomDomainOnEmpty": true
+}
 ```
 
 ### 支持的有效期

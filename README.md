@@ -148,10 +148,20 @@ docker run --name forsaken-mail-api -d \
 
 The API validates requested email domains. By default it uses the `host` value from `config-default.json`.
 
+By default, `POST /api/emails/generate` and `POST /admin/new_address` will randomly choose one of the configured domains when `domain` is omitted or provided as an empty string. If you need the old strict behavior, set `randomDomainOnEmpty` to `false` in `config-default.json`.
+
 You can override allowed domains with:
 
 ```bash
 FORSAKEN_MAIL_DOMAINS=mail.example.com,node.example.com
+```
+
+Default config example:
+
+```json
+{
+  "randomDomainOnEmpty": true
+}
 ```
 
 ### Supported expiry values

@@ -319,23 +319,15 @@ $(function(){
     }
 
     setInboxLoading(true);
-    return fetch('/api/emails')
-      .then(function(response) { return response.json(); })
-      .then(function(payload) {
-        var email = (payload.emails || []).find(function(item) {
-          return item.address === address;
-        });
-
-        if(!email) {
-          renderInboxMessages([]);
-          return null;
+    return fetch('/api/mails?address=' + encodeURIComponent(address))
+      .then(function(response) {
+        if(!response.ok) {
+          throw new Error('failed to load inbox history');
         }
-
-        return fetch('/api/emails/' + email.id)
-          .then(function(response) { return response.json(); })
-          .then(function(result) {
-            renderInboxMessages(result.messages || []);
-          });
+        return response.json();
+      })
+      .then(function(messages) {
+        renderInboxMessages(Array.isArray(messages) ? messages : []);
       })
       .catch(function() {
         renderInboxMessages([]);
@@ -356,6 +348,33 @@ $(function(){
     }
 
     return normalized;
+  }
+
+  function setActiveDomain(domain) {
+    if(!domain) {
+      return;
+    }
+
+    activeDomain = domain;
+    persistSelectedDomain(activeDomain);
+    if($domainSelect.length) {
+      $domainSelect.val(activeDomain);
+    }
+  }
+
+  function resolveExistingAddress(localPart) {
+    return fetch('/api/emails/resolve?name=' + encodeURIComponent(localPart))
+      .then(function(response) {
+        if(response.status === 404) {
+          return null;
+        }
+
+        if(!response.ok) {
+          throw new Error('failed to resolve mailbox');
+        }
+
+        return response.json();
+      });
   }
 
   function setCustomPrefixMode(editing) {
@@ -392,12 +411,23 @@ $(function(){
     }
 
     $shortId.parent().removeClass('invalid').addClass('success');
-    localStorage.setItem('shortid', localPart);
-    setMailAddress(localPart);
-    socket.emit('set shortid', { id: localPart, domain: activeDomain });
-    setCustomPrefixMode(false);
-    showCopyToast(t('toast.prefixApplied'));
-    loadInboxHistory();
+    resolveExistingAddress(localPart)
+      .catch(function() {
+        return null;
+      })
+      .then(function(inbox) {
+        var resolvedDomain = inbox && inbox.address && inbox.address.indexOf('@') !== -1
+          ? inbox.address.split('@')[1]
+          : activeDomain;
+
+        localStorage.setItem('shortid', localPart);
+        setActiveDomain(resolvedDomain);
+        setMailAddress(localPart);
+        socket.emit('set shortid', { id: localPart, domain: activeDomain });
+        setCustomPrefixMode(false);
+        showCopyToast(t('toast.prefixApplied'));
+        return loadInboxHistory();
+      });
 
     if(prefixFeedbackTimer) {
       clearTimeout(prefixFeedbackTimer);
@@ -435,6 +465,8 @@ $(function(){
     if(currentAddress && currentAddress.indexOf('@') !== -1) {
       var localPart = currentAddress.split('@')[0];
       setMailAddress(localPart);
+      socket.emit('set shortid', { id: localPart, domain: activeDomain });
+      loadInboxHistory();
     }
   });
 

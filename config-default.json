@@ -5,5 +5,6 @@
     "disableWebhook": true
   },
   "host": "disposable.dhc-app.com",
+  "randomDomainOnEmpty": true,
   "keywordBlackList": ["admin", "postmaster", "system", "webmaster", "administrator", "hostmaster", "service", "server", "root"]
 }
